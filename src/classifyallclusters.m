@@ -4,9 +4,12 @@
 % organised. 
 sets = 0:14
 stationCount = zeros(1,numel(sets));
-for deployment = 3
+for deployment = 1
     for i = 1:numel(sets)
         [dbName, ~, matName] = morlaisfolders(deployment, sets(i));
-        classifyandwrite(dbName, matName);
+        calTable = getcalibration(deployment, sets(1));
+        cal = calTable.HighGain;
+        classifyandwrite(dbName, matName, cal);
+        break
     end
 end

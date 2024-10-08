@@ -1,8 +1,11 @@
-function classifyandwrite(dbName, matName)
+function classifyandwrite(dbName, matName, calibration)
 % take all the clusters from a matlab folder of clusters for a dataset. run
 % the classifier, then write the results as events into the offline clicks
 % tables in a PAMGuard database. If your detector is called anything but 
 % ST_Click_Detector you may need to edit some of the table names. 
+if nargin < 3
+    calibration = 176;
+end
 minCorrelation = 0.9;
 clf
 secsPerDay = 3600*24;
@@ -42,7 +45,7 @@ tic;
 %% add the extra columns needed for amplitude information.
 con = sqlitedatabase(dbName)
 for c = 1:numel(xtraColNames)
-    checkColumn(con, clickTable, xtraColNames{c}, xtraColTypes{c})
+    checkColumn(con, clickTable, xtraColNames{c}, xtraColTypes{c});
 end
 close(con)
 
@@ -105,10 +108,10 @@ for c = 1:numel(clusters)
         ckData{ck,12} = clickFile{ck};
         ckData{ck,13} = evId;
         ckData{ck,14} = clickNo(ck);
-        ckData{ck,15} = amp(ck);
+        ckData{ck,15} = 20*log10(amp(ck)) + calibration;
         ckData{ck,16} = 1;
-        ckData{ck,17} = clusters(c).amp02p(ck);
-        ckData{ck,18} = clusters(c).ampp2p(ck);
+        ckData{ck,17} = 20*log10(clusters(c).amp02p(ck)) + calibration;
+        ckData{ck,18} = 20*log10(clusters(c).ampp2p(ck)) + calibration;
 
 
         ckId = ckId+1;
